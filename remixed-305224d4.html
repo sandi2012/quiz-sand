@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שאלון נעלי ילדים – שילב</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;800&family=Secular+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FFF9F2; --text:#4A4A4A; --soft:#9A8878; --white:#FFFFFF;
+  --border:#EDE0D4; --border-light:#F5EDE4;
+  --btn:#E07A5F; --btn-dark:#C4614A; --btn-light:#FEF4F0;
+  --mint:#A3E4D7; --mint-dark:#7CC8BA; --mint-light:#EAF8F5;
+  --progress-bg:#EDE0D4;
+  --card-shadow: 0 2px 12px rgba(160,120,80,.08);
+  --card-shadow-hover: 0 8px 28px rgba(160,120,80,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Heebo',sans-serif;color:var(--text);min-height:100vh;background:var(--bg)}
+.container{max-width:660px;margin:0 auto;padding:28px 20px 80px}
+
+/* Header */
+header{text-align:center;margin-bottom:32px;animation:popIn .7s cubic-bezier(.34,1.56,.64,1) both}
+header h1{font-family:'Secular One',sans-serif;font-size:clamp(1.1rem,4.5vw,1.55rem);color:var(--text);white-space:nowrap;margin-bottom:8px;line-height:1.3;font-weight:400}
+header p{font-size:.88rem;color:var(--soft)}
+
+/* Progress */
+.progress-wrapper{margin-bottom:32px}
+.progress-label-row{display:flex;justify-content:space-between;margin-bottom:9px;font-size:.75rem;color:var(--soft);font-weight:600}
+.progress-bar{height:7px;background:var(--progress-bg);border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--mint-dark));border-radius:10px;transition:width .55s cubic-bezier(.4,0,.2,1)}
+
+/* Steps */
+.step{display:none}.step.active{display:block;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+
+/* Question header */
+.question-text{font-family:'Secular One',sans-serif;font-size:1.4rem;color:var(--text);margin-bottom:6px;line-height:1.35;text-align:center;font-weight:400}
+.question-sub{font-size:.85rem;color:var(--soft);margin-bottom:20px;text-align:center}
+
+/* Option buttons – general */
+.options-grid{display:grid;gap:11px;margin-bottom:22px}
+.options-grid.two-col{grid-template-columns:1fr 1fr}
+.option-btn{background:var(--white);border:1.8px solid var(--border);border-radius:16px;padding:16px 14px;cursor:pointer;
+  transition:all .2s ease;font-family:'Heebo',sans-serif;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  box-shadow:var(--card-shadow);position:relative}
+.option-btn:hover{border-color:var(--mint-dark);transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
+.option-btn.selected{border-color:var(--mint);background:var(--mint-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(163,228,215,.3)}
+.option-btn.selected::after{content:'✓';position:absolute;top:-8px;left:-8px;width:22px;height:22px;background:var(--mint-dark);border-radius:50%;color:white;font-size:.7rem;display:flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--white)}
+.option-btn.wide{flex-direction:row;text-align:right;padding:15px 20px;gap:16px;justify-content:flex-start}
+.opt-icon-wrap{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--soft);transition:color .2s}
+.option-btn.selected .opt-icon-wrap{color:var(--mint-dark)}
+.option-btn.wide .opt-icon-wrap{width:44px;height:44px}
+.opt-title{font-weight:700;font-size:.92rem;color:var(--text);line-height:1.3}
+.opt-sub{font-size:.73rem;color:var(--soft);line-height:1.4}
+.option-btn.wide .opt-text{flex:1;text-align:right}
+
+/* Brand grid */
+.brand-btn{background:var(--white);border:1.8px solid var(--border);border-radius:14px;padding:12px 12px;cursor:pointer;
+  transition:all .2s ease;font-family:'Heebo',sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  box-shadow:var(--card-shadow);min-height:76px;justify-content:center;position:relative}
+.brand-btn:hover{border-color:var(--mint-dark);transform:translateY(-2px);box-shadow:var(--card-shadow-hover)}
+.brand-btn.selected{border-color:var(--mint);background:var(--mint-light);transform:translateY(-2px)}
+.brand-btn.any-btn{grid-column:1/-1;flex-direction:row;justify-content:center;gap:10px;min-height:50px}
+.brand-logo-wrap{height:36px;display:flex;align-items:center;justify-content:center}
+.wm{white-space:nowrap;font-family:'Heebo',sans-serif;line-height:1.2;text-align:center}
+.brand-sub{font-size:.67rem;color:var(--soft);text-align:center;line-height:1.3}
+.check-badge{display:none;position:absolute;top:-7px;left:-7px;width:20px;height:20px;background:var(--mint-dark);border-radius:50%;color:white;font-size:.62rem;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--white)}
+.brand-btn.selected .check-badge{display:flex}
+
+/* Size */
+.size-section{background:var(--white);border:1.8px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:11px;box-shadow:var(--card-shadow)}
+.size-display{font-family:'Secular One',sans-serif;font-size:2.2rem;color:var(--btn);text-align:center;margin-bottom:6px;line-height:1;font-weight:400}
+.size-range{width:100%;accent-color:var(--mint-dark);cursor:pointer}
+.size-indicators{display:flex;justify-content:space-between;font-size:.65rem;color:var(--soft);margin-top:5px}
+.size-category{display:block;text-align:center;margin-top:9px;font-size:.78rem;font-weight:600;padding:3px 12px;border-radius:20px;background:var(--mint-light);color:var(--mint-dark);width:fit-content;margin-inline:auto}
+.dont-know-btn{background:var(--white);border:1.8px dashed var(--border);border-radius:13px;padding:12px 16px;cursor:pointer;font-family:'Heebo',sans-serif;font-size:.88rem;color:var(--soft);width:100%;text-align:right;display:flex;align-items:center;gap:10px;margin-bottom:16px;transition:all .2s}
+.dont-know-btn:hover,.dont-know-btn.selected{border-color:var(--mint-dark);color:var(--mint-dark);background:var(--mint-light)}
+
+/* Measure tip – visually separated */
+.tip-separator{display:flex;align-items:center;gap:12px;margin-bottom:13px;color:var(--soft);font-size:.75rem;font-weight:600}
+.tip-separator::before,.tip-separator::after{content:'';flex:1;height:1px;background:var(--border)}
+.measure-link{display:flex;align-items:center;gap:12px;background:#FFFBF0;border:1.5px solid #F0D88A;border-radius:13px;padding:12px 15px;text-decoration:none;color:var(--text);margin-bottom:20px;transition:all .2s;box-shadow:0 2px 8px rgba(240,200,80,.1)}
+.measure-link:hover{background:#FFF7E0;border-color:#D4A820;transform:translateY(-1px);box-shadow:0 4px 14px rgba(212,168,32,.15)}
+.ml-icon{font-size:1.4rem;flex-shrink:0}
+.ml-title{font-weight:700;font-size:.82rem;color:var(--text);line-height:1.3}
+.ml-sub{font-size:.72rem;color:var(--soft);margin-top:2px}
+
+/* Nav */
+.nav-buttons{display:flex;gap:11px;margin-top:8px}
+.btn-back{background:transparent;border:1.8px solid var(--border);border-radius:12px;padding:13px 18px;font-family:'Heebo',sans-serif;font-size:.88rem;color:var(--soft);cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-back:hover{border-color:var(--soft);color:var(--text)}
+.btn-next{flex:1;background:linear-gradient(135deg,var(--btn),var(--btn-dark));border:none;border-radius:12px;padding:14px 28px;font-family:'Heebo',sans-serif;font-size:.98rem;font-weight:700;color:white;cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 16px rgba(224,122,95,.3)}
+.btn-next:hover:not(:disabled){transform:translateY(-2px) scale(1.02);box-shadow:0 8px 22px rgba(224,122,95,.4)}
+.btn-next:disabled{opacity:.32;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* Results */
+#results{display:none}
+.results-hero{text-align:center;padding:24px 0 26px;animation:popIn .6s ease both}
+.results-hero h2{font-family:'Secular One',sans-serif;font-size:1.8rem;color:var(--text);margin-bottom:8px;font-weight:400}
+.results-hero p{font-size:.92rem;color:var(--soft)}
+.summary-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 22px}
+.pill{background:white;border:1.5px solid var(--border);border-radius:20px;padding:4px 13px;font-size:.78rem;color:var(--soft);font-weight:600}
+.pill.highlight{background:var(--mint-light);border-color:var(--mint-dark);color:var(--mint-dark)}
+.combined-banner{background:linear-gradient(135deg,#2d5a8e,#1a3d6b);border-radius:16px;padding:17px 20px;margin-bottom:16px;animation:fadeUp .3s ease both}
+.combined-banner h3{color:white;font-size:.95rem;font-weight:700;margin-bottom:5px}
+.combined-banner p{color:rgba(255,255,255,.72);font-size:.8rem;margin-bottom:13px}
+.btn-combined{display:block;width:100%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:white;border-radius:10px;padding:10px 16px;font-family:'Heebo',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:all .2s}
+.btn-combined:hover{background:rgba(255,255,255,.25);transform:translateY(-1px)}
+.brand-card{background:var(--white);border:1.8px solid var(--border);border-radius:17px;padding:19px;margin-bottom:11px;transition:all .2s ease;animation:fadeUp .4s ease both;box-shadow:var(--card-shadow)}
+.brand-card:hover{border-color:var(--mint-dark);box-shadow:var(--card-shadow-hover);transform:translateY(-2px)}
+.brand-header{display:flex;align-items:center;gap:13px;margin-bottom:11px}
+.brand-icon{min-width:54px;height:54px;border-radius:13px;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 12px}
+.brand-name{font-family:'Secular One',sans-serif;font-size:1.08rem;color:var(--text);font-weight:400}
+.brand-meta{font-size:.77rem;color:var(--soft);margin-top:3px}
+.brand-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tag{background:var(--mint-light);border-radius:8px;padding:3px 10px;font-size:.73rem;color:var(--mint-dark);font-weight:600}
+.btn-shop{display:block;width:100%;background:linear-gradient(135deg,var(--btn),var(--btn-dark));color:white;border:none;border-radius:11px;padding:13px 16px;font-family:'Heebo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;transition:all .2s;box-shadow:0 4px 12px rgba(224,122,95,.25)}
+.btn-shop:hover{transform:translateY(-2px);box-shadow:0 7px 18px rgba(224,122,95,.35)}
+.results-nav{display:flex;gap:11px;margin-top:26px}
+.btn-restart{flex:1;background:transparent;border:1.8px solid var(--btn);border-radius:12px;padding:12px 22px;font-family:'Heebo',sans-serif;font-size:.9rem;font-weight:700;color:var(--btn);cursor:pointer;transition:all .2s;text-align:center}
+.btn-restart:hover{background:var(--btn);color:white;transform:translateY(-2px)}
+.btn-results-back{background:transparent;border:1.8px solid var(--border);border-radius:12px;padding:12px 18px;font-family:'Heebo',sans-serif;font-size:.88rem;color:var(--soft);cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-results-back:hover{border-color:var(--soft);color:var(--text)}
+.no-results-img{display:block;width:130px;height:130px;margin:0 auto 16px;object-fit:contain}
+.success-match-img{display:block;width:110px;height:110px;margin:0 auto 12px;object-fit:contain}
+.results-title-success{color:var(--text)}
+.results-title-error{color:#3d2b1a}
+.no-results-card{text-align:center;padding:12px 20px 36px}
+.no-results-body{font-size:.9rem;color:var(--soft);line-height:1.8;margin-bottom:28px;max-width:380px;margin-inline:auto}
+.btn-restart-primary{background:linear-gradient(135deg,var(--btn),var(--btn-dark));color:white;border:none;border-radius:12px;padding:13px 32px;font-family:'Heebo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);box-shadow:0 4px 14px rgba(224,122,95,.3)}
+.btn-restart-primary:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 8px 20px rgba(224,122,95,.42)}
+@media(max-width:480px){header h1{white-space:normal;font-size:clamp(1rem,5vw,1.3rem)}.question-text{font-size:1.22rem}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>בואו נמצא יחד את הבחירה המושלמת לילדך!</h1>
+  <p>4 שאלות קצרות ונגיע לדגם המדויק</p>
+</header>
+
+<div class="progress-wrapper">
+  <div class="progress-label-row"><span id="progress-label">שלב 1 מתוך 4</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step-1">
+  <div class="question-text">באיזה שלב הילד/ה בהליכה?</div>
+  <div class="question-sub">זה ישפיע על סוג הסוליה ורמת הגמישות הנדרשת</div>
+  <div class="options-grid">
+    <button class="option-btn wide" onclick="selectOne(this,'step-1','next-1','stage','walker')">
+      <div class="opt-icon-wrap">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="44" height="44">
+          <path d="M5 30 C7 32 14 33 22 33 C30 33 38 31 38 30 L37 25 C36 23 33 23 30 23 L26 17 C25 16 23 16 21 16 L15 16 C13 16 12 18 11 20 L8 25 C6 27 5 29 5 30Z"/>
+          <path d="M16 23 L24 23"/><path d="M25 18 L29 23"/><path d="M5 29 L38 29"/>
+        </svg>
+      </div>
+      <div class="opt-text"><div class="opt-title">הולך מיומן</div><div class="opt-sub">מעל 3 שבועות – הולך בביטחון</div></div>
+    </button>
+    <button class="option-btn wide" onclick="selectOne(this,'step-1','next-1','stage','first')">
+      <div class="opt-icon-wrap">
+        <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" width="44" height="44">
+          <path d="M16 36 C14 31 13 26 15 20 C17 14 20 12 23 12 C26 12 28 15 27 21 C26 27 24 31 22 36"/>
+          <circle cx="15" cy="8" r="2.5"/><circle cx="21" cy="7" r="2.5"/>
+          <circle cx="27" cy="8.5" r="2.3"/><circle cx="31" cy="13" r="2"/>
+        </svg>
+      </div>
+      <div class="opt-text"><div class="opt-title">צעדים ראשונים</div><div class="opt-sub">הולך עד 3 שבועות – רק התחיל לצעוד</div></div>
+    </button>
+  </div>
+  <div class="nav-buttons"><button class="btn-next" id="next-1" onclick="nextFromStep1()" disabled>המשך ←</button></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step-2">
+  <div class="question-text">מה מידת הנעל?</div>
+  <div class="question-sub">גרור לבחירת המידה, או סמן "לא יודע/ת"</div>
+  <div class="size-section" id="size-slider-section">
+    <div class="size-display" id="sizeDisplay">22</div>
+    <input type="range" class="size-range" id="sizeRange" min="18" max="35" value="22" oninput="updateSize(this.value)">
+    <div class="size-indicators"><span>18</span><span>20</span><span>22</span><span>24</span><span>26</span><span>28</span><span>30</span><span>33</span><span>35</span></div>
+    <span class="size-category" id="sizeCategory">קטן (19–22)</span>
+  </div>
+  <button class="dont-know-btn" id="dont-know-btn" onclick="toggleDontKnow()">
+    <span style="font-size:1.1rem">🤷</span>
+    <div><div style="font-weight:700;color:var(--text)">לא יודע/ת את המידה</div><div style="font-size:.75rem">נציג את כל הדגמים</div></div>
+  </button>
+
+  <div class="tip-separator">💡 לא בטוחים במידה?</div>
+  <a class="measure-link" href="https://www.youtube.com/watch?v=MA9Sfhjobzk&time_continue=1&source_ve_path=MjM4NTE" target="_blank">
+    <span class="ml-icon">🎬</span>
+    <div>
+      <div class="ml-title">כך תדעו את המידה ואיך למדוד את המידה של ילדכם 😊</div>
+      <div class="ml-sub">לחצו לצפייה בסרטון הדרכה קצר</div>
+    </div>
+  </a>
+
+  <div class="nav-buttons">
+    <button class="btn-back" onclick="goTo('step-1')">→ חזרה</button>
+    <button class="btn-next" id="next-2" onclick="goTo('step-3')">המשך ←</button>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step-3">
+  <div class="question-text">איזה סגנון נעל מחפשים?</div>
+  <div class="question-sub">ניתן לבחור יותר מאחד</div>
+  <div class="options-grid two-col">
+    <button class="option-btn" onclick="toggleStyle(this,'sandal')">
+      <div class="opt-icon-wrap"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="38" height="38"><path d="M8 30 C11 32 15 33 20 33 C25 33 29 32 32 30 L32 27 C29 29 25 30 20 30 C15 30 11 29 8 27 Z"/><path d="M20 30 L20 22"/><path d="M20 22 L13 15"/><path d="M20 22 L27 15"/><path d="M13 15 Q20 12 27 15"/></svg></div>
+      <div class="opt-title">סנדל</div>
+    </button>
+    <button class="option-btn" onclick="toggleStyle(this,'barefoot')">
+      <div class="opt-icon-wrap"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" width="38" height="38"><path d="M17 35 C15 30 14 25 16 19 C18 13 21 11 24 11 C27 11 28 15 27 20 C26 25 24 30 22 35"/><circle cx="13" cy="9" r="2.3"/><circle cx="19" cy="7.5" r="2.3"/><circle cx="25" cy="8" r="2.1"/><circle cx="30" cy="11" r="1.9"/><circle cx="32" cy="16" r="1.6"/></svg></div>
+      <div class="opt-title">ברפוט</div><div class="opt-sub">סוליה דקה וגמישה</div>
+    </button>
+    <button class="option-btn" onclick="toggleStyle(this,'vegan')">
+      <div class="opt-icon-wrap"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="38" height="38"><path d="M20 34 C20 34 7 27 8 14 C8 14 16 7 27 12 C38 17 35 30 20 34Z"/><path d="M20 34 L20 18"/><path d="M20 27 L12 20"/><path d="M20 22 L28 14"/></svg></div>
+      <div class="opt-title">טבעוני</div>
+    </button>
+    <button class="option-btn" onclick="toggleStyle(this,'sneakers')">
+      <div class="opt-icon-wrap"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="38" height="38"><path d="M5 31 C8 33 15 34 22 33 C29 32 35 30 35 29 L35 23 C32 21 28 22 25 23 L21 15 C20 13 18 13 16 14 L12 17 C10 19 9 22 9 25 C7 27 5 30 5 31Z"/><path d="M12 17 L12 27"/><path d="M12 20 L21 19"/><path d="M12 24 L20 23"/><path d="M5 30 L35 30"/></svg></div>
+      <div class="opt-title">סניקרס</div>
+    </button>
+    <button class="option-btn" onclick="toggleStyle(this,'boots')">
+      <div class="opt-icon-wrap"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="38" height="38"><path d="M14 6 L14 22 C14 22 11 25 9 27 C7 29 8 31 11 32 L32 32 C34 32 34 30 32 29 L27 26 L27 6 Z"/><path d="M14 12 L27 12"/><path d="M9 31 Q13 34 18 32"/><path d="M17 22 Q22 25 27 22"/></svg></div>
+      <div class="opt-title">מגף</div>
+    </button>
+    <button class="option-btn" onclick="toggleStyle(this,'sport')">
+      <div class="opt-icon-wrap"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" width="38" height="38"><path d="M4 28 C6 31 13 33 22 33 C31 33 37 30 37 28 L36 23 C34 21 30 21 27 22 L23 14 C22 12 20 12 18 13 L13 16 C11 17 10 20 9 23 L6 26 C4 27 4 27 4 28Z"/><path d="M13 16 C17 20 24 23 31 21"/><path d="M4 27 L37 27"/></svg></div>
+      <div class="opt-title">נעלי ספורט</div>
+    </button>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn-back" onclick="goTo('step-2')">→ חזרה</button>
+    <button class="btn-next" id="next-3" onclick="goTo('step-4')" disabled>המשך ←</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step-4">
+  <div class="question-text">יש מותג מועדף?</div>
+  <div class="question-sub">ניתן לבחור כמה מותגים — "לא משנה" מבטל את השאר</div>
+  <div class="options-grid two-col" id="brand-grid"></div>
+  <div class="nav-buttons">
+    <button class="btn-back" onclick="goTo('step-3')">→ חזרה</button>
+    <button class="btn-next" id="next-4" onclick="showResults()" disabled>✨ הצג המלצות</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="results-hero">
+    <div id="results-emoji" style="margin-bottom:6px"></div>
+    <h2 id="results-title" class="results-title-success">יש! מצאנו את ההתאמה המושלמת!</h2>
+    <p id="results-subtitle"></p>
+  </div>
+  <div class="summary-pills" id="summary-pills"></div>
+  <div id="combined-link-wrap"></div>
+  <div id="results-list"></div>
+  <div class="results-nav">
+    <button class="btn-results-back" onclick="goTo('step-4')">→ שנה בחירה</button>
+    <button class="btn-restart" onclick="restart()">↩ התחל מחדש</button>
+  </div>
+</div>
+</div>
+
+<script>
+const BASE='https://sandisrael.co.il/product-category/';
+const CAT={
+  first:'%D7%AA%D7%99%D7%A0%D7%95%D7%A7%D7%95%D7%AA/%D7%A0%D7%A2%D7%9C%D7%99-%D7%A6%D7%A2%D7%93-%D7%A8%D7%90%D7%A9%D7%95%D7%9F/',
+  sandal:'%D7%A1%D7%A0%D7%93%D7%9C%D7%99%D7%9D/',
+  barefoot:'%D7%91%D7%A8%D7%A4%D7%95%D7%98-%D7%9C%D7%99%D7%9C%D7%93%D7%99%D7%9D/',
+  boots:'%D7%9E%D7%92%D7%A4%D7%99%D7%99%D7%9D/',
+  sport:'%D7%A0%D7%A2%D7%9C%D7%99-%D7%A1%D7%A4%D7%95%D7%A8%D7%98-%D7%9C%D7%99%D7%9C%D7%93%D7%99%D7%9D/',
+  sneakers:'%D7%A1%D7%A0%D7%99%D7%A7%D7%A8%D7%A1-%D7%99%D7%9C%D7%93%D7%99%D7%9D/',
+  vegan:'%D7%AA%D7%99%D7%A0%D7%95%D7%A7%D7%95%D7%AA/%D7%A0%D7%A2%D7%9C%D7%99-%D7%A6%D7%A2%D7%93-%D7%A8%D7%90%D7%A9%D7%95%D7%9F-%D7%98%D7%91%D7%A2%D7%95%D7%A0%D7%99%D7%95%D7%AA/',
+};
+const LOGOS={
+  bobux:'<span class="wm" style="color:#2a2a2a;font-weight:800;font-size:1.05rem;letter-spacing:1px">BOBUX</span>',
+  igor:'<span class="wm" style="color:#0c7b9c;font-weight:400;font-size:1.5rem;letter-spacing:-.5px">igor</span>',
+  noanoa:'<span class="wm" style="font-family:\'Arial Black\',\'Arial Bold\',sans-serif;font-weight:900;font-size:.9rem;color:#111;letter-spacing:-1px">NOANOA</span>',
+  garvalin:'<span class="wm" style="font-size:.76rem;line-height:1.35;text-align:center"><span style="color:#f15a00;font-weight:700;display:block">biomecanics</span><span style="color:#e8231f;font-weight:800;font-size:.95rem;font-style:italic">garvalín</span></span>',
+  goo6:'<span class="wm" style="display:flex;flex-direction:column;align-items:center;gap:1px"><span style="font-family:\'Arial Rounded MT Bold\',Arial,sans-serif;font-weight:900;font-size:.93rem;color:#2a2a2a;letter-spacing:1.5px">GOO6</span><span style="font-size:.48rem;letter-spacing:3.5px;color:#aaa;font-weight:700">SHOES</span></span>',
+  lellykelly:'<span class="wm" style="color:#e6007e;font-weight:700;font-style:italic;font-family:Georgia,serif;font-size:.93rem">Lelli Kelly</span>',
+  seeds:'<span class="wm" style="display:flex;align-items:center;gap:3px"><span style="font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-weight:400;font-size:1.1rem;color:#1e1e1e;letter-spacing:-.3px">Seeds</span><span style="font-size:.8rem">🌱</span></span>',
+  cienta:'<span class="wm" style="color:#d4531a;font-weight:800;font-size:1rem;letter-spacing:.5px">CIENTA</span>',
+  plaktonspain:'<span class="wm" style="color:#7d6cb5;font-weight:800;font-size:.82rem;letter-spacing:1px;text-align:center;line-height:1.3">PLAKTON<br><span style="font-size:.68rem">SPAIN</span></span>',
+  dumiyot:'<span class="wm" style="color:#8e44ad;font-weight:800;font-size:1rem">דמויות</span>',
+};
+const BRANDS=[
+  {id:'bobux',       name:'Bobux',                 slug:'bobux',                desc:'נעלי ילדים מניו זילנד',          stages:['first','walker'],styles:['barefoot','sandal','sneakers'],          sizeMin:18,sizeMax:33},
+  {id:'plaktonspain',name:'Plakton Spain',          slug:'plakton-spain',        desc:'סנדלי שעם לילדים',               stages:['walker'],        styles:['sandal','sport','sneakers'],             sizeMin:20,sizeMax:35},
+  {id:'garvalin',    name:'Garvalin / Biomecanics', slug:'garvalin-biomechanics',desc:'ברפוט וביומכניקה מספרד',         stages:['walker'],        styles:['barefoot','sandal','sneakers'],          sizeMin:19,sizeMax:35},
+  {id:'igor',        name:'Igor',                   slug:'igor',                 desc:'סנדלים וסניקרס צבעוניים מספרד', stages:['walker'],        styles:['sneakers','sandal','barefoot'],          sizeMin:18,sizeMax:35},
+  {id:'goo6',        name:'Goo-6',                  slug:'go-6',                 desc:'מותג המתמחה בברפוט לילדים',     stages:['walker'],        styles:['barefoot','vegan','sandal','sneakers'],  sizeMin:19,sizeMax:27},
+  {id:'lellykelly',  name:'Lelli Kelly',             slug:'lelli-kelly',          desc:'סנדלים ונעליים מיוחדות לבנות',  stages:['walker'],        styles:['boots','sneakers','sandal'],             sizeMin:24,sizeMax:35},
+  {id:'seeds',       name:'Seeds',                  slug:'seeds',                desc:'נעלי ילדים איכותיות',            stages:['walker'],        styles:['sandal','sneakers','sport'],             sizeMin:25,sizeMax:35},
+  {id:'cienta',      name:'Cienta',                 slug:'cienta',               desc:'נעלי בד צבעוניות מספרד',         stages:['walker'],        styles:['sandal','sneakers','barefoot','vegan'],  sizeMin:20,sizeMax:35},
+  {id:'dumiyot',     name:'דמויות',                 slug:'%D7%93%D7%9E%D7%95%D7%99%D7%95%D7%AA',desc:'נעלי וסנדלי הדמויות האהובות',stages:['walker'],styles:['sneakers','sandal'],sizeMin:22,sizeMax:35},
+  {id:'noanoa',      name:'Noa Noa',                slug:'noa-noa',              desc:'אופנה ארץ ישראלית',              stages:['walker'],        styles:['sneakers','sandal','boots'],             sizeMin:20,sizeMax:35},
+];
+const ans={size:22,sizeUnknown:false,styles:new Set(),brandSet:new Set()};
+const STYLE_PRIORITY=['vegan','barefoot','sandal','boots','sport','sneakers'];
+function getCatKey(b){if(ans.stage==='first')return'first';const c=STYLE_PRIORITY.find(s=>(ans.styles.size===0||ans.styles.has(s))&&b.styles.includes(s));return c||'sandal';}
+function buildLink(b){let u=BASE+CAT[getCatKey(b)]+'?filter_product-brands='+b.slug;if(!ans.sizeUnknown)u+='&filter_size='+ans.size;return u;}
+function buildCombinedLink(bs){let u=BASE+CAT[getCatKey(bs[0])]+'?filter_product-brands='+bs.map(b=>b.slug).join('%2C');if(!ans.sizeUnknown)u+='&filter_size='+ans.size;return u;}
+
+function renderBrandGrid(){
+  const g=document.getElementById('brand-grid');g.innerHTML='';
+  BRANDS.forEach(b=>{
+    const btn=document.createElement('button');btn.className='brand-btn';btn.dataset.id=b.id;
+    btn.innerHTML=`<span class="check-badge">✓</span><div class="brand-logo-wrap">${LOGOS[b.id]||b.name}</div><div class="brand-sub">${b.desc}</div>`;
+    btn.onclick=()=>toggleBrand(btn,b.id);g.appendChild(btn);
+  });
+  const any=document.createElement('button');any.className='brand-btn any-btn';any.dataset.id='any';
+  any.innerHTML=`<span style="font-size:1.2rem">🤷</span><div style="font-weight:700;font-size:.9rem;color:var(--text)">לא משנה לי – הצג הכל</div>`;
+  any.onclick=()=>toggleBrand(any,'any');g.appendChild(any);
+}
+function toggleBrand(btn,id){
+  if(id==='any'){const was=btn.classList.contains('selected');document.querySelectorAll('#brand-grid .brand-btn').forEach(b=>b.classList.remove('selected'));ans.brandSet.clear();if(!was){btn.classList.add('selected');ans.brandSet.add('any');}}
+  else{document.querySelector('.any-btn')?.classList.remove('selected');ans.brandSet.delete('any');btn.classList.toggle('selected');btn.classList.contains('selected')?ans.brandSet.add(id):ans.brandSet.delete(id);}
+  document.getElementById('next-4').disabled=ans.brandSet.size===0;
+}
+function nextFromStep1(){
+  if(ans.stage==='first'){showFirstStepsResult();return;}
+  goTo('step-2');
+}
+function showFirstStepsResult(){
+  const link='https://sandisrael.co.il/?s=xp&jet_ajax_search_settings=%7B%22search_source%22%3A%5B%22post%22%2C%22product%22%5D%7D&post_type=post%2Cproduct';
+  document.getElementById('results-emoji').innerHTML='';
+  const t=document.getElementById('results-title');
+  t.textContent='יש! מצאנו את ההתאמה המושלמת!';
+  t.className='results-title-success';
+  document.getElementById('results-subtitle').textContent='מצאנו את הקולקציה המושלמת לצעדים הראשונים של ילדכם!';
+  document.getElementById('summary-pills').innerHTML='<span class="pill highlight">👶 צעדים ראשונים</span>';
+  document.getElementById('combined-link-wrap').innerHTML='';
+  document.getElementById('results-list').innerHTML=`<div class="brand-card" style="animation:fadeUp .4s ease both">
+    <div class="brand-header">
+      <div class="brand-icon" style="font-size:1.5rem;min-width:54px">👶</div>
+      <div>
+        <div class="brand-name">נעלי צעד ראשון</div>
+        <div class="brand-meta">הקולקציה המלאה של נעלי הצעד הראשון שלנו</div>
+      </div>
+    </div>
+    <a class="btn-shop" href="${link}" target="_blank">🛍️ לצפייה בנעלי צעד ראשון באתר</a>
+  </div>`;
+  document.getElementById('progressFill').style.width='100%';
+  document.getElementById('progress-label').textContent='הושלם!';
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('results').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateSize(v){ans.size=parseInt(v);document.getElementById('sizeDisplay').textContent=v;}
+function toggleDontKnow(){ans.sizeUnknown=!ans.sizeUnknown;document.getElementById('dont-know-btn').classList.toggle('selected',ans.sizeUnknown);const sl=document.getElementById('size-slider-section');sl.style.opacity=ans.sizeUnknown?'.35':'1';sl.style.pointerEvents=ans.sizeUnknown?'none':'auto';}
+function selectOne(btn,stepId,nextId,key,val){document.querySelectorAll(`#${stepId} .option-btn`).forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');ans[key]=val;document.getElementById(nextId).disabled=false;}
+function toggleStyle(btn,val){btn.classList.toggle('selected');btn.classList.contains('selected')?ans.styles.add(val):ans.styles.delete(val);document.getElementById('next-3').disabled=ans.styles.size===0;}
+
+const STEP_PROGRESS={'step-1':25,'step-2':50,'step-3':75,'step-4':100};
+function goTo(id){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('results').style.display='none';
+  document.getElementById(id).classList.add('active');
+  const stepNum={'step-1':1,'step-2':2,'step-3':3,'step-4':4};
+  const cur=stepNum[id]||1;
+  document.getElementById('progressFill').style.width=(STEP_PROGRESS[id]||25)+'%';
+  document.getElementById('progress-label').textContent=`שלב ${cur} מתוך 4`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+const styleLabels={sandal:'👡 סנדל',barefoot:'🌿 ברפוט',vegan:'🌱 טבעוני',sneakers:'👟 סניקרס',boots:'🥾 מגף',sport:'⚽ ספורט'};
+const stageLabel={first:'👶 צעדים ראשונים',walker:'🚶 הולך מיומן'};
+function showResults(){
+  const{stage,size,sizeUnknown,styles,brandSet}=ans;
+  const anyBrand=brandSet.has('any')||brandSet.size===0;
+  const matched=BRANDS.filter(b=>{
+    if(!anyBrand&&!brandSet.has(b.id))return false;
+    if(!b.stages.includes(stage))return false;
+    if(!sizeUnknown&&(size<b.sizeMin||size>b.sizeMax))return false;
+    if(styles.size>0&&![...styles].some(s=>b.styles.includes(s)))return false;
+    return true;
+  });
+  const brandNames=anyBrand?['🤷 הכל']:[...brandSet].map(id=>BRANDS.find(b=>b.id===id)?.name||id).map(n=>'🏷️ '+n);
+  const pills=[stageLabel[stage]||'',sizeUnknown?'📏 מידה לא ידועה':`📏 מידה ${size}`,...[...styles].map(s=>styleLabels[s]||s),...brandNames].filter(Boolean);
+  document.getElementById('summary-pills').innerHTML=pills.map(p=>`<span class="pill highlight">${p}</span>`).join('');
+  const emojiEl=document.getElementById('results-emoji');
+  const titleEl=document.getElementById('results-title');
+  if(matched.length){
+    emojiEl.innerHTML='';
+    titleEl.textContent='יש! מצאנו את ההתאמה המושלמת!';
+    titleEl.className='results-title-success';
+    document.getElementById('results-subtitle').textContent=matched.length===1?'איזה כיף, מצאנו מותג אחד שמתאים בול!':`איזה כיף, מצאנו ${matched.length} מותגים שמתאימים בול!`;
+  } else {
+    emojiEl.innerHTML='';
+    titleEl.textContent='אופס! חיפשנו בכל המחסן...';
+    titleEl.className='results-title-error';
+    document.getElementById('results-subtitle').textContent='';
+  }
+  const cw=document.getElementById('combined-link-wrap');
+  const ex=matched.filter(b=>brandSet.has(b.id));
+  if(!anyBrand&&ex.length>=2){const cu=buildCombinedLink(ex);cw.innerHTML=`<div class="combined-banner"><h3>🔗 צפה בכל המותגים שבחרת ביחד</h3><p>${ex.map(b=>b.name).join(' + ')}${sizeUnknown?'':' · מידה '+size}</p><a class="btn-combined" href="${cu}" target="_blank">🛍️ לצפייה ב-${ex.length} מותגים יחד באתר</a></div>`;}
+  else cw.innerHTML='';
+  const list=document.getElementById('results-list');list.innerHTML='';
+  if(!matched.length){list.innerHTML='<div style="text-align:center;padding:48px;color:var(--soft)">😔 לא נמצאו מותגים. נסה לשנות את הבחירות.</div>';}
+  else{matched.forEach((brand,i)=>{
+    const link=buildLink(brand);
+    const ms=[...styles].filter(s=>brand.styles.includes(s));
+    const st=(ms.length?ms:brand.styles).map(s=>`<span class="tag">${styleLabels[s]||s}</span>`).join('');
+    const card=document.createElement('div');card.className='brand-card';card.style.animationDelay=(i*.07)+'s';
+    card.innerHTML=`<div class="brand-header"><div class="brand-icon">${LOGOS[brand.id]||brand.name}</div><div><div class="brand-name">${brand.name}</div><div class="brand-meta">${brand.desc} · מידות ${brand.sizeMin}–${brand.sizeMax}</div></div></div><div class="brand-tags">${st}</div><a class="btn-shop" href="${link}" target="_blank">🛍️ לצפייה בדגמים${sizeUnknown?'':' (מידה '+size+')'}</a>`;
+    list.appendChild(card);
+  });}
+  document.getElementById('progressFill').style.width='100%';
+  document.getElementById('progress-label').textContent='הושלם!';
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('results').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restart(){
+  ans.size=22;ans.sizeUnknown=false;ans.styles=new Set();ans.brandSet=new Set();delete ans.stage;
+  document.getElementById('sizeRange').value=22;updateSize(22);
+  document.getElementById('dont-know-btn').classList.remove('selected');
+  const sl=document.getElementById('size-slider-section');sl.style.opacity='1';sl.style.pointerEvents='auto';
+  document.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));
+  ['next-1','next-3','next-4'].forEach(id=>document.getElementById(id).disabled=true);
+  document.getElementById('results').style.display='none';
+  renderBrandGrid();goTo('step-1');
+}
+updateSize(22);renderBrandGrid();
+</script>
+</body>
+</html>
